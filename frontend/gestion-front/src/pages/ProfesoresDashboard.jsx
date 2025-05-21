@@ -1,55 +1,39 @@
-// src/pages/ProfesoresDashboard.jsx
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import jwtDecode from "jwt-decode";                     // ojo: instala jwt-decode y ajusta la import si tu bundler lo requiere
-import useLogout from "../hooks/useLogout";            // hook que limpia tokens y redirige
-import AgregarProfesor from "../components/AgregarProfesor";
-import SubirCSV from "../components/SubirCSV";
+// frontend/gestion-front/src/pages/ProfesoresDashboard.jsx
+
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import useAutoLogout from '../hooks/useLogout';
+import AgregarProfesor from '../components/AgregarProfesor';
+import SubirCSV from '../components/SubirCSV';
 import {
   getProfesores,
   setAuthToken,
   deleteProfesor,
-} from "../services/profesorService";
-import macroImage from "../assets/macro.png";
-import macroHelp from "../assets/Macro_de_ayuda.xlsm";  // plantilla para CSV
+} from '../services/profesorService';
+import macroImage from '../assets/macro.png';
+import macroHelp from '../assets/Macro_de_ayuda.xlsm';
 
 export default function ProfesoresDashboard() {
   const [profesores, setProfesores] = useState([]);
   const [filteredProfesores, setFilteredProfesores] = useState([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [modalData, setModalData] = useState(null);
   const [showCsvModal, setShowCsvModal] = useState(false);
   const [filters, setFilters] = useState({});
 
   const navigate = useNavigate();
-  const logout = useLogout();                           // hook para logout manual/automático
-  const role = localStorage.getItem("userRole");
+  const logout = useAutoLogout();
+  const role = localStorage.getItem('userRole');
 
-  // Al montar: verifica token, lo inyecta y programa el logout automático
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem('accessToken');
     if (!token) {
-      setError("Sin token, inicia sesión de nuevo.");
-      return navigate("/login");
+      setError('Sin token, inicia sesión de nuevo.');
+      return navigate('/login');
     }
-
     setAuthToken(token);
     refreshProfesores();
-
-    // decodifica fecha de expiración y programa logout
-    try {
-      const { exp } = jwtDecode(token);
-      const delay = exp * 1000 - Date.now();
-      if (delay <= 0) {
-        logout();
-      } else {
-        setTimeout(() => logout(), delay);
-      }
-    } catch {
-      // si hay fallo decodificando, forzar logout
-      logout();
-    }
-  }, []);
+  }, [navigate, logout]);
 
   const refreshProfesores = () => {
     getProfesores()
@@ -57,16 +41,15 @@ export default function ProfesoresDashboard() {
         setProfesores(res.data);
         setFilteredProfesores(res.data);
       })
-      .catch(() => setError("Error al obtener profesores."));
+      .catch(() => setError('Error al obtener profesores.'));
   };
 
-  // Filtrado por columnas
   useEffect(() => {
     let result = profesores;
     Object.entries(filters).forEach(([field, value]) => {
       if (value) {
-        result = result.filter((prof) =>
-          (prof[field]?.toString().toLowerCase() || "").includes(value.toLowerCase())
+        result = result.filter((p) =>
+          (p[field]?.toString().toLowerCase() || '').includes(value.toLowerCase())
         );
       }
     });
@@ -79,35 +62,35 @@ export default function ProfesoresDashboard() {
       await deleteProfesor(prof.id);
       refreshProfesores();
     } catch {
-      alert("No se pudo eliminar");
+      alert('No se pudo eliminar');
     }
   };
 
-  const btnClass = "text-sm px-4 py-2 rounded";
-  const actionBtnClass = "text-xs font-semibold py-1 px-2 rounded";
+  const btnClass = 'text-sm px-4 py-2 rounded';
+  const actionBtnClass = 'text-xs font-semibold py-1 px-2 rounded';
 
   const columns = [
-    { key: "id", label: "ID" },
-    { key: "nombre", label: "Nombre" },
-    { key: "apellido_paterno", label: "Paterno" },
-    { key: "apellido_materno", label: "Materno" },
-    { key: "correo", label: "Correo" },
-    { key: "telefono", label: "Teléfono" },
-    { key: "calle", label: "Calle" },
-    { key: "numero_exterior", label: "N.º Ext" },
-    { key: "numero_interior", label: "N.º Int" },
-    { key: "colonia", label: "Colonia" },
-    { key: "codigo_postal", label: "CP" },
-    { key: "municipio", label: "Municipio" },
-    { key: "entidad", label: "Entidad" },
-    { key: "especialidad", label: "Especialidad" },
-    { key: "numero_trabajador", label: "N.º Trabajador" },
-    { key: "rfc", label: "RFC" },
-    { key: "genero", label: "Género" },
-    { key: "categoria", label: "Categoría" },
-    { key: "grado_academico", label: "Grado Acad." },
-    { key: "fecha_ingreso", label: "Fecha Ingreso" },
-    { key: "actions", label: "Acciones" },
+    { key: 'id', label: 'ID' },
+    { key: 'nombre', label: 'Nombre' },
+    { key: 'apellido_paterno', label: 'Paterno' },
+    { key: 'apellido_materno', label: 'Materno' },
+    { key: 'correo', label: 'Correo' },
+    { key: 'telefono', label: 'Teléfono' },
+    { key: 'calle', label: 'Calle' },
+    { key: 'numero_exterior', label: 'N.º Ext' },
+    { key: 'numero_interior', label: 'N.º Int' },
+    { key: 'colonia', label: 'Colonia' },
+    { key: 'codigo_postal', label: 'CP' },
+    { key: 'municipio', label: 'Municipio' },
+    { key: 'entidad', label: 'Entidad' },
+    { key: 'especialidad', label: 'Especialidad' },
+    { key: 'numero_trabajador', label: 'N.º Trabajador' },
+    { key: 'rfc', label: 'RFC' },
+    { key: 'genero', label: 'Género' },
+    { key: 'categoria', label: 'Categoría' },
+    { key: 'grado_academico', label: 'Grado Acad.' },
+    { key: 'fecha_ingreso', label: 'Fecha Ingreso' },
+    { key: 'actions', label: 'Acciones' },
   ];
 
   return (
@@ -124,7 +107,7 @@ export default function ProfesoresDashboard() {
 
       {error && <p className="text-red-500 mb-2">{error}</p>}
 
-      {(role === "Administrador" || role === "Superusuario") && (
+      {(role === 'Administrador' || role === 'Superusuario') && (
         <div className="flex gap-2 mb-4">
           <button
             onClick={() => setModalData({})}
@@ -139,7 +122,7 @@ export default function ProfesoresDashboard() {
             Subir CSV
           </button>
           <button
-            onClick={() => navigate("/estadisticos")}
+            onClick={() => navigate('/estadisticos')}
             className={`bg-yellow-600 hover:bg-yellow-700 text-white ${btnClass}`}
           >
             Estadísticas
@@ -178,7 +161,6 @@ export default function ProfesoresDashboard() {
         </div>
       )}
 
-      {/* Tabla con filtros */}
       <div className="overflow-x-auto">
         <table className="min-w-full border">
           <thead>
@@ -187,16 +169,13 @@ export default function ProfesoresDashboard() {
                 <th key={col.key} className="border px-2 py-1 text-left text-sm">
                   <div className="flex flex-col">
                     <span>{col.label}</span>
-                    {col.key !== "actions" && (
+                    {col.key !== 'actions' && (
                       <input
                         type="text"
                         placeholder={`Filtrar ${col.label}`}
-                        value={filters[col.key] || ""}
+                        value={filters[col.key] || ''}
                         onChange={(e) =>
-                          setFilters((prev) => ({
-                            ...prev,
-                            [col.key]: e.target.value,
-                          }))
+                          setFilters((prev) => ({ ...prev, [col.key]: e.target.value }))
                         }
                         className="text-xs p-1 border rounded mt-1"
                       />
@@ -210,9 +189,9 @@ export default function ProfesoresDashboard() {
             {filteredProfesores.map((prof) => (
               <tr key={prof.id} className="hover:bg-gray-50">
                 {columns.map((col) =>
-                  col.key === "actions" ? (
+                  col.key === 'actions' ? (
                     <td key="actions" className="border px-2 py-1 text-sm">
-                      {(role === "Administrador" || role === "Superusuario") && (
+                      {(role === 'Administrador' || role === 'Superusuario') && (
                         <div className="flex gap-1">
                           <button
                             onClick={() => setModalData(prof)}
@@ -241,7 +220,6 @@ export default function ProfesoresDashboard() {
         </table>
       </div>
 
-      {/* Modal de Agregar/Editar */}
       {modalData !== null && (
         <AgregarProfesor
           profesorInicial={modalData}
