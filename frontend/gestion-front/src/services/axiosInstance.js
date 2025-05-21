@@ -1,19 +1,22 @@
 // src/services/axiosInstance.js
-import axios from 'axios';
+import axios from "axios";
 
 const instance = axios.create({
-  baseURL: '/api',                // proxy lo redirige a http://127.0.0.1:8000/api
+  baseURL:
+    // lee la variable si existe (Netlify, Vercel, etc.)
+    process.env.REACT_APP_API_BASE_URL ||
+    // si NO existe (dev local), usa el proxy '/api'
+    "/api",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
-// Inyecta o quita el header Authorization en este instance
 export function setAuthToken(token) {
   if (token) {
-    instance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    instance.defaults.headers.common.Authorization = `Bearer ${token}`;
   } else {
-    delete instance.defaults.headers.common['Authorization'];
+    delete instance.defaults.headers.common.Authorization;
   }
 }
 
