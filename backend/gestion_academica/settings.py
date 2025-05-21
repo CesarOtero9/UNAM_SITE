@@ -27,11 +27,16 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "llave-solo-para-desarrollo")
 #   • Local: True por defecto.
 #   • Render: define DJANGO_DEBUG=False para desactivarlo.
 DEBUG = os.getenv("DJANGO_DEBUG", "") != "False"
-
+'''
 ALLOWED_HOSTS = [
     "unam-site-back.onrender.com",  # URL pública Render (ajústala tras el primer deploy)
     "localhost",
     "127.0.0.1",
+]
+'''
+ALLOWED_HOSTS = [
+    "localhost",
+    os.getenv("RENDER_EXTERNAL_HOSTNAME", ""),  # dominio de Render en tiempo de ejecución
 ]
 
 
