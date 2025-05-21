@@ -1,7 +1,7 @@
 [build]
-  base    = "frontend/gestion-front"
-  publish = "build"
-  command = "npm run build"
+  base    = "frontend/gestion-front"      # cd aquí antes de build
+  publish = "frontend/gestion-front/build" # carpeta final estática
+  command = "npm run build"               # tu comando de build
 
 [[redirects]]
   from   = "/*"
