@@ -1,24 +1,36 @@
 // frontend/gestion-front/src/hooks/useLogout.js
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-- import jwtDecode from 'jwt-decode';
-+ import * as jwtDecode from 'jwt-decode';
+import { setAuthToken } from '../services/profesorService';
+const jwtDecode = require('jwt-decode');
 
 export default function useAutoLogout() {
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
-    if (!token) return;
-
-    const { exp } = jwtDecode(token);
-    const timeout = exp * 1000 - Date.now();
-    const handle = setTimeout(() => {
-      // limpia todo
-      localStorage.clear();
+    if (!token) {
       navigate('/login');
-    }, timeout);
+      return;
+    }
 
-    return () => clearTimeout(handle);
+    // Decodifica expiración y limpia token al vencer
+    const { exp } = jwtDecode(token);
+    const msToExpire = exp * 1000 - Date.now();
+
+    if (msToExpire <= 0) {
+      localStorage.clear();
+      setAuthToken(null);
+      navigate('/login');
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      localStorage.clear();
+      setAuthToken(null);
+      navigate('/login');
+    }, msToExpire);
+
+    return () => clearTimeout(timeoutId);
   }, [navigate]);
 }
