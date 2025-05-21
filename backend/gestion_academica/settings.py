@@ -36,8 +36,9 @@ ALLOWED_HOSTS = [
 '''
 ALLOWED_HOSTS = [
     "localhost",
-    os.getenv("RENDER_EXTERNAL_HOSTNAME", ""),  # dominio de Render en tiempo de ejecución
+    "unam-aragon-back.onrender.com",   # ← dominio exacto de Render
 ]
+
 
 
 # ─────────────────────────────────────────────
