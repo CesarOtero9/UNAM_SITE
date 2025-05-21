@@ -3,8 +3,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { setAuthToken } from '../services/profesorService';
-// Traemos jwt-decode con require para evitar problemas de default export
-const jwtDecode = require('jwt-decode');
 
 export default function useAutoLogout() {
   const navigate = useNavigate();
@@ -16,25 +14,32 @@ export default function useAutoLogout() {
       return;
     }
 
-    // Decodificamos la fecha de expiración
-    const { exp } = jwtDecode(token);
-    const msToExpire = exp * 1000 - Date.now();
-
-    if (msToExpire <= 0) {
-      // Ya expiró
-      localStorage.clear();
-      setAuthToken(null);
-      navigate('/login');
+    // Parseamos payload sin jwt-decode
+    let exp;
+    try {
+      const base64Payload = token.split('.')[1];
+      const jsonPayload = atob(base64Payload.replace(/-/g, '+').replace(/_/g, '/'));
+      exp = JSON.parse(jsonPayload).exp;
+    } catch {
+      // Si falla el parseo, forzamos logout
+      doLogout();
       return;
     }
 
-    // Programamos el logout automático justo al expirar
-    const id = setTimeout(() => {
-      localStorage.clear();
-      setAuthToken(null);
-      navigate('/login');
-    }, msToExpire);
+    const msToExpire = exp * 1000 - Date.now();
 
+    if (msToExpire <= 0) {
+      doLogout();
+      return;
+    }
+
+    const id = setTimeout(doLogout, msToExpire);
     return () => clearTimeout(id);
   }, [navigate]);
+
+  function doLogout() {
+    localStorage.clear();
+    setAuthToken(null);
+    navigate('/login');
+  }
 }
