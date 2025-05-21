@@ -1,0 +1,12 @@
+﻿[build]
+  # carpeta donde está tu React
+  base    = "frontend/gestion-front"
+  # carpeta que Netlify debe publicar
+  publish = "build"
+  # comando de build
+  command = "npm run build"
+
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
