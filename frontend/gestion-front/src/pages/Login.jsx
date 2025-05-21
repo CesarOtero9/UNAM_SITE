@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login, setAuthToken } from "../services/profesorService";
+import * as jwtDecode from 'jwt-decode';
 
 /**
  * Componente de inicio de sesión

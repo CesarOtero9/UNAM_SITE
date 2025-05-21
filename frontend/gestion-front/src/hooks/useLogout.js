@@ -1,15 +1,24 @@
-import { useNavigate } from "react-router-dom";
-import { useCallback } from "react";
-import { setAuthToken } from "../services/profesorService"; // o tu axiosInstance
+// frontend/gestion-front/src/hooks/useLogout.js
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+- import jwtDecode from 'jwt-decode';
++ import * as jwtDecode from 'jwt-decode';
 
-export default function useLogout() {
+export default function useAutoLogout() {
   const navigate = useNavigate();
 
-  return useCallback(() => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("userRole");
-    setAuthToken(null);           // quita el header Authorization
-    navigate("/login", { replace: true });
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    const { exp } = jwtDecode(token);
+    const timeout = exp * 1000 - Date.now();
+    const handle = setTimeout(() => {
+      // limpia todo
+      localStorage.clear();
+      navigate('/login');
+    }, timeout);
+
+    return () => clearTimeout(handle);
   }, [navigate]);
 }
