@@ -3,13 +3,12 @@ import axios from "axios";
 
 const instance = axios.create({
   baseURL:
-    // lee la variable si existe (Netlify, Vercel, etc.)
-    process.env.REACT_APP_API_BASE_URL ||
-    // si NO existe (dev local), usa el proxy '/api'
-    "/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
+    // producción
+    process.env.REACT_APP_API_BASE_URL
+      ? `${process.env.REACT_APP_API_BASE_URL}/api`
+      // desarrollo local con proxy
+      : "/api",
+  headers: { "Content-Type": "application/json" },
 });
 
 export function setAuthToken(token) {

@@ -167,10 +167,18 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
+# gestion_academica/settings.py
+
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",              # React dev server
-    "https://unam-site.netlify.app",      # ← tu front en producción — cámbialo si varía
+    "http://localhost:3000",
+    "https://profound-biscuit-ab258c.netlify.app",   # 👈 nuevo dominio
 ]
+
+# opcional: cualquier Deploy Preview de Netlify
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https:\/\/.*\.netlify\.app$",
+]
+
 
 # Si vas a usar https://*.onrender.com para frontends adicionales,
 # Render exige incluirlos en CSRF_TRUSTED_ORIGINS (opcional)
