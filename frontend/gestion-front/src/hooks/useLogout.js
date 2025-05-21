@@ -1,7 +1,9 @@
 // frontend/gestion-front/src/hooks/useLogout.js
+
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { setAuthToken } from '../services/profesorService';
+// Usamos require para jwt-decode porque CRA no da default export
 const jwtDecode = require('jwt-decode');
 
 export default function useAutoLogout() {
@@ -14,23 +16,25 @@ export default function useAutoLogout() {
       return;
     }
 
-    // Decodifica expiración y limpia token al vencer
+    // Decodificamos la fecha de expiración
     const { exp } = jwtDecode(token);
     const msToExpire = exp * 1000 - Date.now();
 
     if (msToExpire <= 0) {
+      // Ya expiró
       localStorage.clear();
       setAuthToken(null);
       navigate('/login');
       return;
     }
 
-    const timeoutId = setTimeout(() => {
+    // Programamos el logout automático justo al expirar
+    const id = setTimeout(() => {
       localStorage.clear();
       setAuthToken(null);
       navigate('/login');
     }, msToExpire);
 
-    return () => clearTimeout(timeoutId);
+    return () => clearTimeout(id);
   }, [navigate]);
 }
