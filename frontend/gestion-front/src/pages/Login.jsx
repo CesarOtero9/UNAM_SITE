@@ -1,51 +1,70 @@
 // src/pages/Login.jsx
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { login, setAuthToken } from '../services/profesorService';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { login, setAuthToken } from "../services/profesorService";
 
+/**
+ * Componente de inicio de sesión
+ * ‣ Limpia cualquier Authorization antes de solicitar un nuevo token
+ * ‣ Guarda access / refresh / role en localStorage
+ * ‣ Inyecta el token en axios para el resto de peticiones
+ */
 export default function Login() {
-  const [user, setUser] = useState('');
-  const [pass, setPass] = useState('');
-  const [error, setError] = useState('');
+  const [user, setUser] = useState("");
+  const [pass, setPass] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+
     try {
-      const { data } = await login(user, pass);
-      // 1. Guardamos tokens
-      localStorage.setItem('accessToken', data.access);
-      localStorage.setItem('refreshToken', data.refresh);
-      // 2. Guardamos el rol que devolvió tu CustomToken serializer
-      localStorage.setItem('userRole', data.role);
-      // 3. Inyectamos el token en axios
+      /* 1️⃣  Asegúrate de NO mandar Authorization en esta llamada */
+      setAuthToken(null);
+
+      /* 2️⃣  Pide los tokens */
+      const { data } = await login(user, pass); // { access, refresh, role }
+
+      /* 3️⃣  Guarda en localStorage */
+      localStorage.setItem("accessToken", data.access);
+      localStorage.setItem("refreshToken", data.refresh);
+      localStorage.setItem("userRole", data.role);
+
+      /* 4️⃣  Inyecta el token para llamadas subsecuentes */
       setAuthToken(data.access);
-      // 4. Redirigimos
-      navigate('/');
+
+      /* 5️⃣  Redirige al dashboard */
+      navigate("/");
     } catch (err) {
-      setError('Usuario o contraseña incorrectos');
+      setError("Usuario o contraseña incorrectos");
     }
   };
 
   return (
-    <div className="max-w-sm mx-auto mt-20 p-6 border rounded shadow">
-      <h2 className="text-2xl font-bold mb-4 text-center">Iniciar Sesión</h2>
-      {error && <p className="text-red-500 mb-2">{error}</p>}
+    <div className="mx-auto mt-20 max-w-sm rounded border p-6 shadow">
+      <h2 className="mb-4 text-center text-2xl font-bold">Iniciar Sesión</h2>
+
+      {error && <p className="mb-2 text-red-500">{error}</p>}
+
       <form onSubmit={handleSubmit}>
         <input
-          className="w-full mb-2 p-2 border rounded"
+          className="mb-2 w-full rounded border p-2"
           placeholder="Usuario"
           value={user}
-          onChange={e => setUser(e.target.value)}
+          onChange={(e) => setUser(e.target.value)}
         />
         <input
-          className="w-full mb-4 p-2 border rounded"
+          className="mb-4 w-full rounded border p-2"
           type="password"
           placeholder="Contraseña"
           value={pass}
-          onChange={e => setPass(e.target.value)}
+          onChange={(e) => setPass(e.target.value)}
         />
-        <button className="w-full p-2 bg-green-600 text-white rounded hover:bg-green-700">
+        <button
+          type="submit"
+          className="w-full rounded bg-green-600 p-2 text-white hover:bg-green-700"
+        >
           Entrar
         </button>
       </form>
