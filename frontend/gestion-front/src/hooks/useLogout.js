@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { setAuthToken } from '../services/profesorService';
-// Usamos require para jwt-decode porque CRA no da default export
+// Traemos jwt-decode con require para evitar problemas de default export
 const jwtDecode = require('jwt-decode');
 
 export default function useAutoLogout() {
